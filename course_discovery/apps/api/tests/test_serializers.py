@@ -200,6 +200,8 @@ class CourseSerializerTests(MinimalCourseSerializerTests):
             'collaborators': [],
             'skill_names': [course_skill.skill.name],
             'skills': [{'name': course_skill.skill.name, 'description': course_skill.skill.description}],
+            'organization_shortcode': '',
+            'org_logo_override': None
         })
 
         return expected
@@ -248,6 +250,28 @@ class CourseSerializerTests(MinimalCourseSerializerTests):
         serializer = self.serializer_class(course, context={'request': request, 'exclude_utm': 1, 'editable': 1})
         assert serializer.data['marketing_url'] is not None
         assert serializer.data['marketing_url'] == course.marketing_url
+
+    def test_org_logo_and_shortcode_override(self):
+        request = make_request()
+        course_draft = CourseFactory(draft=True)
+        draft_course_run = CourseRunFactory(draft=True, course=course_draft)
+        course_draft.canonical_course_run = draft_course_run
+        course_draft.save()
+
+        course = CourseFactory(draft=False, draft_version_id=course_draft.id)
+        course_run = CourseRunFactory(draft=False, course=course, draft_version_id=draft_course_run.id)
+        course.canonical_course_run = course_run
+        course.organization_shortcode = 'testorg_overriden'
+        course.org_logo_override = course.image
+        course.save()
+
+        serializer = self.serializer_class(course, context={'request': request, 'exclude_utm': 1, 'editable': 1})
+
+        assert serializer.data['organization_shortcode'] is not None
+        assert serializer.data['organization_shortcode'] == 'testorg_overriden'
+
+        assert serializer.data['org_logo_override'] is not None
+        assert serializer.data['org_logo_override'].get('src') is not None
 
 
 class CourseEditorSerializerTests(TestCase):

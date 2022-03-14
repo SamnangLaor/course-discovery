@@ -866,6 +866,19 @@ class Course(DraftModelMixin, PkSearchableMixin, CachedMixin, TimeStampedModel):
     salesforce_id = models.CharField(max_length=255, null=True, blank=True)  # Course__c in Salesforce
     salesforce_case_id = models.CharField(max_length=255, null=True, blank=True)  # Case in Salesforce
     type = models.ForeignKey(CourseType, models.CASCADE, null=True)  # while null IS True, it should always be set
+    org_logo_override = StdImageField(
+        upload_to=UploadToFieldNamePath(populate_from='name', path='media/course/org/logo_override/'),
+        blank=True,
+        null=True,
+        variations={
+            'large': (256, 256),
+            'medium': (128, 128),
+            'small': (64, 64),
+            'x-small': (32, 32),
+        },
+        help_text=_('Please provide an image file with transparent background'),
+    )
+    organization_shortcode = models.CharField(max_length=255, blank=True)
 
     # Do not record the slug field in the history table because AutoSlugField is not compatible with
     # django-simple-history.  Background: https://github.com/edx/course-discovery/pull/332
@@ -921,6 +934,12 @@ class Course(DraftModelMixin, PkSearchableMixin, CachedMixin, TimeStampedModel):
     def original_image_url(self):
         if self.image:
             return self.image.url
+        return None
+
+    @property
+    def org_logo_override_url(self):
+        if self.org_logo_override:
+            return self.org_logo_override.url
         return None
 
     @property
