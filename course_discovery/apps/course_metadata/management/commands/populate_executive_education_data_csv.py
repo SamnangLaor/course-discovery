@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     # The list to define order of the header keys in csv.
     OUTPUT_CSV_HEADERS = [
-        'organization', '2u_organization_code', 'edx_organization_code','title', '2u_title', 'edx_title', 'number',
+        'organization', '2u_organization_code', 'edx_organization_code', 'title', '2u_title', 'edx_title', 'number',
         'alternate_number', 'course_enrollment_track', 'image', 'short_description', 'long_description',
         'what_will_you_learn', 'course_level', 'primary_subject', '2u_primary_subject', 'subject_subcategory',
         'verified_price', 'collaborators', 'syllabus', 'prerequisites', 'learner_testimonials',
